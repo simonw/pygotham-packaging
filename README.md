@@ -191,3 +191,87 @@ git push
 ```
 The [Actions tab](https://github.com/simonw/pids/actions) in my repository instantly ran the test suite.
 
+## Publishing a new release using GitHub
+
+The `.github/workflows/publish.yml` file is triggered by new GitHub releases, testing them and then publishing them up to PyPI using `twine`. That file looks like this:
+
+```yaml
+name: Publish Python Package
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8, 3.9]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - uses: actions/cache@v2
+      name: Configure pip caching
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/setup.py') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: Install dependencies
+      run: |
+        pip install -e '.[test]'
+    - name: Run tests
+      run: |
+        pytest
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [test]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+    - uses: actions/cache@v2
+      name: Configure pip caching
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-publish-pip-${{ hashFiles('**/setup.py') }}
+        restore-keys: |
+          ${{ runner.os }}-publish-pip-
+    - name: Install dependencies
+      run: |
+        pip install setuptools wheel twine
+    - name: Publish
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+      run: |
+        python setup.py sdist bdist_wheel
+        twine upload dist/*
+```
+It contains two jobs: the `test` job runs the tests again - we should never publish a package without first ensuring that the test suite passes - and then the `deploy` job runs `python setup.py sdist bdist_wheel` followed by `twine upload dist/*` to upload the resulting packages.
+
+Before running that action, I needed to create a `PYPI_TOKEN` that the action could use to authenticate with my PyPI account.
+
+I used the https://pypi.org/manage/account/token/ page to create that token:
+
+<img width="784" alt="Add_API_token_·_PyPI" src="https://user-images.githubusercontent.com/9599/132279691-e3488807-428b-4a60-96e4-ecfb8a31f236.png">
+
+I then copied and pasted the new secret token:
+
+<img width="1251" alt="Add_API_token_·_PyPI" src="https://user-images.githubusercontent.com/9599/132279794-64054e62-6bdf-4b72-ad34-7a540b8bf41c.png">
+
+And used the "Settings -> Secrets" tab on the GitHub repository to add that as a secret called `PYPI_TOKEN`:
+
+<img width="1372" alt="Actions_secrets" src="https://user-images.githubusercontent.com/9599/132279901-0f063ebe-8da7-4701-a7c4-9e26fa5bc347.png">
+
+(I have since revoked the token that I used in the video, since it is visible on screen to anyone watching.)
+
+I used the GitHub web interface to edit `setup.py` to bump the version number in that file up to `0.1.2`, then I navigated to the [releases tab](https://github.com/simonw/pids/releases) in the repository, clicked "Draft new release" and created a release that would create a new `0.1.2` tag as part of the release process.
+
+When I published the release, the `publish.yml` action started to run. After the tests had passed it pushed the new release to PyPI: https://pypi.org/project/pids/0.1.2/
