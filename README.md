@@ -131,3 +131,63 @@ tests/test_pids.py ..                                                    [100%]
 
 ============================== 2 passed in 0.01s ===============================
 ```
+## Creating a GitHub repository
+
+I created a repository using the form at https://github.com/new
+
+Having created the [simonw/pids](https://github.com/simonw/pids) repository, I ran the following commands locally to push my code to it (mostly copy and pasted from the GitHub example):
+```
+git init
+git add README.md pids.py setup.py tests/test_pids.py
+git commit -m "first commit"
+git branch -M main
+git remote add origin git@github.com:simonw/pids.git
+git push -u origin main
+```
+
+## Running the tests with GitHub Actions
+
+I copied in a `.github/workflows` folder from [another project](https://github.com/simonw/sqlite-explain/tree/main/.github/workflows) with two files, `test.yml` and `publish.yml`. The `.github/workflows/test.yml` file contained this:
+
+```yaml
+name: Test
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8, 3.9]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - uses: actions/cache@v2
+      name: Configure pip caching
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/setup.py') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: Install dependencies
+      run: |
+        pip install -e '.[test]'
+    - name: Run tests
+      run: |
+        pytest
+```
+The `matrix` block there causes the job to run four times, on four different versions of Python. The steps checkout the current repository, install Python, configure pip caching and then install the test dependencies and run the tests.
+
+I added and pushed the new files:
+
+```
+git add .github
+git commit -m "GitHub Actions"
+git push
+```
+The [Actions tab](https://github.com/simonw/pids/actions) in my repository instantly ran the test suite.
+
