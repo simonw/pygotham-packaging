@@ -51,3 +51,33 @@ View at:
 https://pypi.org/project/pids/0.1/
 ```
 The release is now live at https://pypi.org/project/pids/0.1/ - and anyone can run `pip install pids` to install it.
+
+## Adding a README
+
+I added a `README.md` file [containing this](https://raw.githubusercontent.com/simonw/pids/0.1.2/README.md). Then I modified my `setup.py` file to look like this:
+```python
+from setuptools import setup
+import os
+
+def get_long_description():
+    with open(
+        os.path.join(os.path.dirname(__file__), "README.md"),
+        encoding="utf8",
+    ) as fp:
+        return fp.read()
+
+setup(
+    name="pids",
+    version="0.1.1",
+    long_description=get_long_description(),
+    long_description_content_type="text/markdown",
+    description="A tiny Python library for generating public IDs from integers",
+    author="Simon Willison",
+    url="https://github.com/simonw/...",
+    license="Apache License, Version 2.0",    
+    py_modules=["pids"],
+)
+```
+Note that I updated the version number too.
+
+Running `python3 setup.py sdist` created a new file called `dist/pids-0.1.1.tar.gz` - I then uploaded that file using `twine upload dist/pids-0.1.1.tar.gz` which created a new release with a visible README at https://pypi.org/project/pids/0.1.1/
