@@ -35,3 +35,19 @@ Having done this, I could excute the library like so:
     >>> import pids
     >>> pids.pid.from_int(1234)
     'gxd'
+
+## Uploading the package to PyPI
+
+I used [twine](https://pypi.org/project/twine/) (`pip install twine`) to upload my new package to [PyPI](https://pypi.org/). I had to paste in my PyPI account's username and password:
+```
+% twine upload dist/pids-0.1.tar.gz
+Uploading distributions to https://upload.pypi.org/legacy/
+Enter your username: simonw
+Enter your password: 
+Uploading pids-0.1.tar.gz
+100%|██████████████████████████████████████| 4.16k/4.16k [00:00<00:00, 4.56kB/s]
+
+View at:
+https://pypi.org/project/pids/0.1/
+```
+The release is now live at https://pypi.org/project/pids/0.1/ - and anyone can run `pip install pids` to install it.
