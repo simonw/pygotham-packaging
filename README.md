@@ -23,3 +23,15 @@ I started out by creating a new `pids` package using [this code](https://github.
     )
     ```
 4. Run `python3 setup.py sdist` to create the packaged source distribution, `dist/pids-0.1.tar.gz`
+
+## Testing it in a Jupyter notebook
+
+Having created that file, I demonstrated how it can be installed in a Jupyter notebook by running the following in a notebook cell:
+
+    %pip install /Users/simon/Dropbox/Presentations/2021/pygotham/pids/dist/pids-0.1.tar.gz
+
+Having done this, I could excute the library like so:
+
+    >>> import pids
+    >>> pids.pid.from_int(1234)
+    'gxd'
