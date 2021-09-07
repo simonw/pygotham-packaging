@@ -81,3 +81,53 @@ setup(
 Note that I updated the version number too.
 
 Running `python3 setup.py sdist` created a new file called `dist/pids-0.1.1.tar.gz` - I then uploaded that file using `twine upload dist/pids-0.1.1.tar.gz` which created a new release with a visible README at https://pypi.org/project/pids/0.1.1/
+
+## Adding some tests
+
+I like using [pytest](https://docs.pytest.org/) for tests, so I added that as a test dependency by modifying `setup.py` to add the following two lines:
+
+```python
+    extras_require={"test": ["pytest"]},
+    tests_require=["pids[test]"],
+```
+Next, I created a virtual environment and installed my package and its test dependencies into it in "editable" mode like so:
+
+```
+python3 -m venv venv
+source venv/bin/activate
+pip install -e '.[test]'
+```
+Now I can run the tests!
+
+```
+(venv) pids % pytest
+============================= test session starts ==============================
+platform darwin -- Python 3.9.6, pytest-6.2.5, py-1.10.0, pluggy-1.0.0
+rootdir: /Users/simon/Dropbox/Presentations/2021/pygotham/pids
+collected 0 items                                                              
+
+============================ no tests ran in 0.01s =============================
+```
+There aren't any tests yet. I created a `tests/` folder and then dropped in a `test_pids.py` file that looked like this:
+```python
+import pytest
+import pids
+
+def test_from_int():
+    assert pids.pid.from_int(1234) == "gxd"
+
+def test_to_int():
+    assert pids.pid.to_int("gxd") == 1234
+```
+Running `pytest` in the project directory now runs those tests:
+```
+(venv) pids % pytest
+============================= test session starts ==============================
+platform darwin -- Python 3.9.6, pytest-6.2.5, py-1.10.0, pluggy-1.0.0
+rootdir: /Users/simon/Dropbox/Presentations/2021/pygotham/pids
+collected 2 items                                                              
+
+tests/test_pids.py ..                                                    [100%]
+
+============================== 2 passed in 0.01s ===============================
+```
