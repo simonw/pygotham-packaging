@@ -2,6 +2,8 @@
 
 Notes from my presentation on Python packaging at PyGotham 2021
 
+A more comprehensive version of these notes can be found on my blog: [How to build, test and publish an open source Python library](https://simonwillison.net/2021/Nov/4/publish-open-source-python-library/)
+
 ## Packaging a single module
 
 I started out by creating a new `pids` package using [this code](https://github.com/CAVaccineInventory/vial/blob/main/vaccinate/core/baseconverter.py), which I have copied-and-pasted into several different projects over the years.
