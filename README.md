@@ -86,11 +86,10 @@ Running `python3 setup.py sdist` created a new file called `dist/pids-0.1.1.tar.
 
 ## Adding some tests
 
-I like using [pytest](https://docs.pytest.org/) for tests, so I added that as a test dependency by modifying `setup.py` to add the following two lines:
+I like using [pytest](https://docs.pytest.org/) for tests, so I added that as a test dependency by modifying `setup.py` to add the following line:
 
 ```python
-    extras_require={"test": ["pytest"]},
-    tests_require=["pids[test]"],
+    extras_require={"test": ["pytest"]}
 ```
 Next, I created a virtual environment and installed my package and its test dependencies into it in "editable" mode like so:
 
